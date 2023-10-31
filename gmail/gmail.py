@@ -12,15 +12,13 @@ from .config import (
 
 
 class GmailAccount:
-    def __init__(self, session):
+    def __init__(self, session, azt="", ae="", dsh="", tl=""):
         self.session = session
         self.timeout = 5
-        self.azt = ''
-        self.ae = ''
-        self.dsh = ''
-
-    def validate_result(self, response) -> bool:
-        pass
+        self.azt = azt
+        self.ae = ae
+        self.dsh = dsh
+        self.tl = tl
 
     async def call_signup(self):
         url = SIGNUP_URL
@@ -30,24 +28,22 @@ class GmailAccount:
             response = await self.session.get(
                 url,
                 headers=header,
-                timeout=self.timeout,
+                timeout=1000,
             )
             status_code = response.status
             res_data = await response.text()
-            
+
             global_data = re.findall(
                 r"window.WIZ_global_data = (.*?);</script>", res_data
             )
-            format_str = global_data[0].replace("\\\"", "")
+            format_str = global_data[0].replace('\\"', "")
             json_data = json.loads(format_str)
-            
-            self.ae = json_data.get("thykhd")
-            self.azt = json_data.get("OewCAd").split(',').pop()[:-1]
-            self.dsh = json_data.get("Qzxixc")
-            
-            print(self.ae)
-            print(self.azt)
 
+            self.ae = re.findall(r"&quot;,null,null,null,&quot;(.*?)&quot;", res_data)[
+                0
+            ]
+            self.azt = json_data.get("OewCAd").split(",").pop()[:-1]
+            self.dsh = json_data.get("Qzxixc")
             is_success = status_code == 200
         except Exception as e:
             print(str(e))
@@ -57,230 +53,64 @@ class GmailAccount:
     async def call_validate_personal(self):
         url = VALIDATE_PERSONAL_URL
         header = VALIDATE_PERSONAL_HEADER
-        data = {
-            "continue": "https://mail.google.com/mail/u/0/&dsh=S-1357936412:1690047970143809&emr=1&flowEntry=ServiceLogin",
-            "dsh": "S-1357936412:1690047970143809",
-            "flowEntry": "ServiceLogin",
-            "followup": "https://mail.google.com/mail/u/0/",
-            "ifkv": "AeDOFXhCFmTSacmtS5Gfy8i8JiIMSGaHMtiOZMuhOOug5SJMJsIJQYdZVPEvR8s8z0fPzepEsJaG",
-            "theme": "glif",
-            "f.req": [
-                self.ae,
-                "Toan",
-                "Le",
-                "Toan",
-                "Le",
-                0,
-                1,
-                None,
-                None,
-                "web-glif-signup",
-                0,
-                None,
-                1,
-                [
-                    None,
-                    None,
-                    [],
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    [],
-                    None,
-                    None,
-                    None,
-                    None,
-                    [],
-                ],
-                1,
-            ],
-            "azt": self.azt,
-            "cookiesDisabled": False,
-            "deviceinfo": [
-                None,
-                None,
-                None,
-                [],
-                None,
-                "VN",
-                None,
-                None,
-                None,
-                "GlifWebSignIn",
-                None,
-                [
-                    None,
-                    None,
-                    [],
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    [],
-                    None,
-                    None,
-                    None,
-                    None,
-                    [],
-                ],
-                None,
-                None,
-                None,
-                None,
-                1,
-                None,
-                0,
-                1,
-                "",
-                None,
-                None,
-                1,
-                1,
-            ],
-            "gmscoreversion": "undefined",
-            "flowName": "GlifWebSignIn",
-            "checkConnection": "youtube:86:0",
-            "checkedDomains": "youtube",
-            "pstMsg": 1,
-        }
+        raw_data = f'continue=https://accounts.google.com/&dsh={self.dsh}&flowEntry=ServiceLogin&followup=https://accounts.google.com/&ifkv=AVQVeyxXhIn2uVhrnXzAymbHAW8ijA5r7aQqTBzTFPzp8QXPBbsRBVS2VlE84q_6bwehT_Hu9dYW&theme=glif&f.req=["{self.ae}","Toan","Le","Toan","Le"%2C0%2C1%2Cnull%2Cnull%2C%22web-glif-signup%22%2C0%2Cnull%2C1%2C%5Bnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%5D%2C1%5D&azt={self.azt}&cookiesDisabled=false&deviceinfo=%5Bnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2C%22VN%22%2Cnull%2Cnull%2Cnull%2C%22GlifWebSignIn%22%2Cnull%2C%5Bnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2C0%2C1%2C%22%22%2Cnull%2Cnull%2C1%2C1%5D&gmscoreversion=undefined&flowName=GlifWebSignIn&checkConnection=youtube%3A93%3A0&checkedDomains=youtube&pstMsg=1&'
+
         is_success = False
         try:
             response = await self.session.post(
-                url, data=data, headers=header, timeout=self.timeout
+                url, data=raw_data, headers=header, timeout=5
             )
             status_code = response.status
             res_data = await response.text()
-            print(status_code)
-            print(res_data)
+            self.tl = re.findall(r"gf\.ttu\",null,\"(.*?)\"]", res_data)[0]
             is_success = status_code == 200
         except Exception as e:
             print(e)
 
         return is_success
 
-    async def call_usernamea_vailability(self, tl: str, username: str):
-        url = USERNAME_AVAILABILITY_URL.format(tl)
+    async def call_username_availability(self, username: str):
+        url = USERNAME_AVAILABILITY_URL.format(self.tl)
         header = USERNAME_AVAILABILITY_HEADER
-        data = {
-            "continue": "https://accounts.google.com/",
-            "dsh": self.dsh,
-            "flowEntry": "ServiceLogin",
-            "followup": "https://accounts.google.com/",
-            "ifkv": "AVQVeyw6J6WFYpq-qEm7_Z0aSnpETfpc7jiMyPQzWVigNEl3EDQpW3aOKWztqNdvIFKisVlxpP7_",
-            "theme": "glif",
-            "f.req": [f"TL:{tl}", username, 0, 0, 1, None, 0, 30481],
-            "azt": self.azt,
-            "cookiesDisabled": False,
-            "deviceinfo": [
-                None,
-                None,
-                None,
-                [],
-                None,
-                "VN",
-                None,
-                None,
-                None,
-                "GlifWebSignIn",
-                None,
-                [
-                    None,
-                    None,
-                    [],
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    [],
-                    None,
-                    None,
-                    None,
-                    None,
-                    [],
-                ],
-                None,
-                None,
-                None,
-                None,
-                1,
-                None,
-                0,
-                1,
-                "",
-                None,
-                None,
-                1,
-                1,
-            ],
-            "gmscoreversion": "undefined",
-            "flowName": "GlifWebSignIn",
-            "checkConnection": "youtube:86:0",
-            "checkedDomains": "youtube",
-            "pstMsg": 1,
-        }
+        raw_data = f"continue=https%3A%2F%2Faccounts.google.com%2Fb%2F0%2FAddMailService&dsh={self.dsh}&flowEntry=ServiceLogin&followup=https%3A%2F%2Faccounts.google.com%2Fb%2F0%2FAddMailService&ifkv=AVQVeyyf9q-bmuViM90CQymcrX8ivPqO4BAkyc_7NSpErWpdN34mvHk88n5d45AkoQZpe0K9EpzZ&theme=glif&f.req=%5B%22TL%3A{self.tl}%22%2C%22{username}%22%2C0%2C0%2C1%2Cnull%2C0%2C762%5D&azt={self.azt}&cookiesDisabled=false&deviceinfo=%5Bnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2C%22VN%22%2Cnull%2Cnull%2Cnull%2C%22GlifWebSignIn%22%2Cnull%2C%5Bnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2C0%2C1%2C%22%22%2Cnull%2Cnull%2C1%2C1%5D&gmscoreversion=undefined&flowName=GlifWebSignIn&checkConnection=youtube%3A192%3A0&checkedDomains=youtube&pstMsg=1&"
         is_success = False
+        try:
+            response = await self.session.post(
+                url, data=raw_data, headers=header, timeout=5
+            )
+            status_code = response.status
+            res_data = await response.text()
+            failed = '"er",null,null,null,null,400'
+            success = ["1", "5", "7"]
+            code = re.findall(r"gf\.uar\",(.*?),\"TL", res_data)
+            code = code[0] if code else None
 
-        return is_success
+            if failed in res_data:
+                return False, True
+            if status_code == 200 and code in success:
+                is_success = True
+
+        except Exception as e:
+            print(e)
+
+        return is_success, False
 
     async def check_account(self, username: str) -> bool:
         is_success = await self.call_signup()
-        tl = await self.call_validate_personal()
-        # res = await self.call_usernamea_vailability(tl, azt, username)
-        # is_success = self.validate_result(res)
+        if not is_success:
+            print("retry")
 
-        return is_success
+        validate_success = await self.call_validate_personal()
+        if not validate_success:
+            print(retry)
+
+        validate_username, retry = await self.call_username_availability(username)
+        if validate_username:
+            print(username)
+        else:
+            print("call error")
+
+        if retry:
+            print("need retry")
+
+        return True

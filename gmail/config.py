@@ -11,7 +11,6 @@ VALIDATE_PERSONAL_URL = "https://accounts.google.com/_/signup/validatepersonalde
 VALIDATE_PERSONAL_HEADER = {
     "Accept": "*/*",
     "Accept-Language": "en-USen;q=0.9",
-    "Content-Length": "1463",
     "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     "Google-Accounts-Xsrf": "1",
     "Origin": "https://accounts.google.com",
@@ -27,7 +26,7 @@ VALIDATE_PERSONAL_HEADER = {
     "Sec-Gpc": "1",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
     "X-Same-Domain": "1",
-    "Cookie": "NID=511=LMx5QAr8l1q9I_DURlv1f6GB6l7DU8aM02XKt-QdGb00len83AHv5mZgdzQs3QSAf49wrieDvrshyEcUf-oNowB3SvwUR1RScz-s90_on3ourasiVREdoCZiRtjtZXxf5lzZV5BtIm9lE3UPWPLje-IzwxA3a0pqrIn9DeI12nM; OTZ=7272549_28_28__28_; __Host-GAPS=1:T29VJEKRsh3Ozeild6v75kGDQJFurg:qKuYGiv287Hd5LQl",
+    "Cookie": "__Host-GAPS=1:T29VJEKRsh3Ozeild6v75kGDQJFurg:qKuYGiv287Hd5LQl",
 }
 
 USERNAME_AVAILABILITY_URL = (
@@ -36,7 +35,6 @@ USERNAME_AVAILABILITY_URL = (
 USERNAME_AVAILABILITY_HEADER = {
     "Accept": "*/*",
     "Accept-Language": "en-USen;q=0.9",
-    "Content-Length": "1463",
     "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     "Google-Accounts-Xsrf": "1",
     "Origin": "https://accounts.google.com",

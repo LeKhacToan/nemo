@@ -13,7 +13,7 @@ class Scaffold:
     async def gmail():
         async with ClientSession() as session:
             gmail = GmailAccount(session)
-            await gmail.check_account("lkhactoan")
+            await gmail.check_account("lkhactoan1")
 
 
 if __name__ == "__main__":
