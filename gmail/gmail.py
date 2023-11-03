@@ -126,11 +126,10 @@ class GmailAccount:
 
     async def run(self, username):
         validate_username, retry = await self.call_username_availability(username)
+        if retry:
+            Log.warning(username)
+        
         if validate_username:
             Log.success(username)
         else:
             Log.error(username)
-            pass
-
-        if retry:
-            Log.warning(username)
