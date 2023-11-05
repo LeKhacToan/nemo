@@ -2,3 +2,6 @@
 venv
 .env
 **.txt
+*.csv
+*.log
+format.py

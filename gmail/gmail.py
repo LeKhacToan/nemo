@@ -79,11 +79,17 @@ class GmailAccount:
 
         return is_success
 
-    async def call_username_availability(self, username: str):
+    async def call_username_availability(
+        self, username: str, dsh=None, azt=None, tl=None
+    ):
+        dsh = dsh if dsh else self.dsh
+        azt = azt if azt else self.azt
+        tl = tl if tl else self.tl
+
         async with self.semaphore:
             url = USERNAME_AVAILABILITY_URL.format(self.tl)
             header = USERNAME_AVAILABILITY_HEADER
-            raw_data = f"continue=https%3A%2F%2Faccounts.google.com%2Fb%2F0%2FAddMailService&dsh={self.dsh}&flowEntry=ServiceLogin&followup=https%3A%2F%2Faccounts.google.com%2Fb%2F0%2FAddMailService&ifkv=AVQVeyyf9q-bmuViM90CQymcrX8ivPqO4BAkyc_7NSpErWpdN34mvHk88n5d45AkoQZpe0K9EpzZ&theme=glif&f.req=%5B%22TL%3A{self.tl}%22%2C%22{username}%22%2C0%2C0%2C1%2Cnull%2C0%2C762%5D&azt={self.azt}&cookiesDisabled=false&deviceinfo=%5Bnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2C%22VN%22%2Cnull%2Cnull%2Cnull%2C%22GlifWebSignIn%22%2Cnull%2C%5Bnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2C0%2C1%2C%22%22%2Cnull%2Cnull%2C1%2C1%5D&gmscoreversion=undefined&flowName=GlifWebSignIn&checkConnection=youtube%3A192%3A0&checkedDomains=youtube&pstMsg=1&"
+            raw_data = f"continue=https%3A%2F%2Faccounts.google.com%2Fb%2F0%2FAddMailService&dsh={dsh}&flowEntry=ServiceLogin&followup=https%3A%2F%2Faccounts.google.com%2Fb%2F0%2FAddMailService&ifkv=AVQVeyyf9q-bmuViM90CQymcrX8ivPqO4BAkyc_7NSpErWpdN34mvHk88n5d45AkoQZpe0K9EpzZ&theme=glif&f.req=%5B%22TL%3A{tl}%22%2C%22{username}%22%2C0%2C0%2C1%2Cnull%2C0%2C762%5D&azt={azt}&cookiesDisabled=false&deviceinfo=%5Bnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2C%22VN%22%2Cnull%2Cnull%2Cnull%2C%22GlifWebSignIn%22%2Cnull%2C%5Bnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2C0%2C1%2C%22%22%2Cnull%2Cnull%2C1%2C1%5D&gmscoreversion=undefined&flowName=GlifWebSignIn&checkConnection=youtube%3A192%3A0&checkedDomains=youtube&pstMsg=1&"
             is_success = False
             try:
                 response = await self.session.post(
@@ -100,7 +106,6 @@ class GmailAccount:
                 success = ["1", "5", "7"]
                 code = re.findall(r"gf\.uar\",(.*?),\"TL", res_data)
                 code = code[0] if code else None
-                print(f"{username}: {code}")
 
                 if failed in res_data:
                     return False, True
@@ -108,7 +113,8 @@ class GmailAccount:
                     is_success = True
 
             except Exception as e:
-                print(e)
+                mess = str(e) if e else "Timeout"
+                Log.error(mess)
                 return False, True
 
         return is_success, False
@@ -128,8 +134,19 @@ class GmailAccount:
         validate_username, retry = await self.call_username_availability(username)
         if retry:
             Log.warning(username)
-        
+            return
+
         if validate_username:
             Log.success(username)
         else:
             Log.error(username)
+
+    async def processor_message(self, message):
+        tl = message.get("tl")
+        dsh = message.get("dsh")
+        azt = message.get("azt")
+        username = message.get("username")
+
+        success, retry = await self.call_username_availability(
+            username=username, dsh=dsh, azt=azt, tl=tl
+        )

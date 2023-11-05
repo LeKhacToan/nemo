@@ -18,7 +18,7 @@ class Scaffold:
     def gmail():
         async def __gmail():
             start_time = time.time()
-        
+
             accounts = Account().get_accounts()
             semaphore = asyncio.Semaphore(500)
 
@@ -35,7 +35,7 @@ class Scaffold:
                 await asyncio.gather(*tasks)
 
                 time_difference = time.time() - start_time
-                print(f'Scraping time: %.2f seconds.' % time_difference)
+                print(f"Scraping time: %.2f seconds." % time_difference)
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(__gmail())
